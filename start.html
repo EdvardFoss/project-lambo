@@ -1,0 +1,101 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="assets/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="assets/materialize.min.js"></script>
+  <script src="assets/cookie.js"></script>
+</head>
+<body>
+  <div id="logo" style="margin-top:500px;display:none;">
+    <img src="/assets/lamboLogo.png" style="display:block;margin:0 auto;width:100%;position:absolute;">
+  </div>
+  <div id="print-players" style="text-align:center;position:relative;top:500px;"></div>
+  <div id="wrapper" style="display:none;">
+    <div id="add-player-text-div" style="display:block;">
+      <input id="add-player-text" type="text" style="display:block;margin:0 auto;text-align-last:center;font-size: 4rem;position:relative;top:800px;width:80%;border-bottom: 2px solid #9e9e9e;" placeholder="Spillernavn...">
+    </div>
+    <div>
+      <button class="waves-effect waves-light btn" style="display:block;margin:0 auto;position: relative;top: 840px;font-size: 60px;height:120px;border-radius: 50px;" onclick="addPlayer()">Legg til spiller</button>
+    </div>
+    <div>
+      <button class="waves-effect waves-light btn" style="display:block;margin:0 auto;position:relative;top:900px;font-size:60px;height:120px;border-radius: 50px;" onclick="startGame()">Få det på!</button>
+    </div>
+  </div>
+</body>
+</html>
+<script>
+  // GLOBALS
+    var allPlayers = []; // array containing all players
+
+      window.onload = function(e) {
+
+          $("#logo").fadeIn(500);
+
+          setTimeout(function() {
+            $("#logo").animate({
+              marginTop: 10
+            }, 1000);
+          }, 1000);
+
+          setTimeout(function() {
+            $("#wrapper").fadeIn(500);
+          }, 2000);
+      }
+
+// ------------ ADD PLAYER
+  function addPlayer() {
+
+    var playerName = document.getElementById("add-player-text").value;
+
+    if (playerName == "") {
+
+      Materialize.toast('Ups! Du må skrive inn et spillernavn.', 3000, 'rounded')
+
+    } else {
+
+      allPlayers.push(playerName);
+      console.log(allPlayers);
+      document.getElementById("add-player-text").value = "";
+
+      printPlayers(allPlayers);
+
+      if (allPlayers.length == 1) {
+        Materialize.toast('Tips:<br>Trykk på en spiller for å slette!', 3000, 'rounded')
+      }
+    }
+  }
+
+  function printPlayers(allPlayers) {
+
+    var html = "";
+    for (var i = 0; i < allPlayers.length;i++) {
+          html += '<p id="'+ allPlayers[i] +'" style="font-size:4rem;display:inline-block;margin-left:20px;margin-bottom:0px;margin-top:20px;border:1px solid #bbbbbb;padding:10px;border-radius: 80px;" onclick="deletePlayer(this.id)">'+ allPlayers[i] +'</p>';
+    }
+    document.getElementById("print-players").innerHTML = html;
+  }
+
+  function startGame() {
+
+    if (allPlayers.length <= 0) {
+      Materialize.toast('Du kan ikke starte uten spillere!', 3000, 'rounded')
+    } else {
+      if (allPlayers.length <= 1) {
+        Materialize.toast('Er det ikke litt stusselig å spille alene?', 3000, 'rounded')
+      } else {
+        // PUSH TO COOKIE AND START GAME
+        $.cookie("allPlayers", JSON.stringify(allPlayers));
+      }
+    }
+  }
+
+  function deletePlayer(clicked_id) {
+
+      $('#'+ clicked_id +'').fadeOut(300);
+      var index = allPlayers.indexOf(''+ clicked_id +'');
+      if (index >= 0) {
+        allPlayers.splice( index, 1);
+    }
+  }
+
+</script>
