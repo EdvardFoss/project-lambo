@@ -253,14 +253,15 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
 
     // aboslute numbers
     var qTruth_count = Math.floor((game_length/100) * 30); // 30 %
-    var qDare_count = Math.floor((game_length/100) * 30); // 30 %
-    var qMemory_count = Math.floor((game_length/100) * 10); // 10 %
+    var qDare_count = Math.floor((game_length/100) * 25); // 25 %
+    var qMemory_count = Math.floor((game_length/100) * 15); // 15 %
     var qMultiplayer_count = Math.floor((game_length/100) * 15); // 15 %
     var qAll_count = Math.floor((game_length/100) * 15); // 15 %
 
     for (var i = 0; i < allQuestions.entries.length; i++) {
 
       randomNumber = randomizeNumber(start, end);
+      randomNumberThatHaveBeenUsed.push(randomNumber); // not used yet
 
       if (allQuestions.entries[randomNumber].Type == '1') {
 
@@ -341,3 +342,66 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
     return number;
 
   }
+  //-----------------------------------------------------------------
+  var game_counter = 0;
+  var status = 1;
+
+  function gameCounter() {
+
+    game_counter++;
+    return game_counter;
+  }
+
+  function game() {
+
+    // color identifiers
+    var truth_color = 'green';
+    var dare_color = 'blue';
+    var memory_color = 'yellow';
+    var multiplayer_color = 'orange';
+    var all_color = 'red';
+
+    var game_counter = gameCounter();
+    var game_length = current_game_questions.entries.length;
+    //console.log("Game length: "+ game_length);
+
+    if (game_counter == game_length) {
+
+      status = 0;
+
+      console.log("Game finished");
+
+      var html = "";
+          html += '<h4 style="color:white;">Spillet er ferdig!</h4>';
+          html += '';
+          html += '';
+          html += '';
+
+      document.getElementById("question-div").innerHTML = html;
+
+    } else {
+
+      // set body color based on question type
+      if (current_game_questions.entries[game_counter].Type == '1') {
+        document.getElementById("body").style.backgroundColor = truth_color;
+      } else if (current_game_questions.entries[game_counter].Type == '2') {
+        document.getElementById("body").style.backgroundColor = dare_color;
+      } else if (current_game_questions.entries[game_counter].Type == '3') {
+        document.getElementById("body").style.backgroundColor = memory_color;
+      } else if (current_game_questions.entries[game_counter].Type == '5') {
+        document.getElementById("body").style.backgroundColor = multiplayer_color;
+      } else if (current_game_questions.entries[game_counter].Type == '6') {
+        document.getElementById("body").style.backgroundColor = all_color;
+      }
+
+      document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
+      }
+  }
+  window.addEventListener('touchstart', function() {
+
+    if (status = 1) {
+      game();
+    } else {
+      alert('back');
+    }
+  });
