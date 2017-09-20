@@ -1,12 +1,6 @@
 
 // GET COOKIE WITH PLAYER NAMES
 var allPlayers // array with all players
-var question_truth = [];
-var question_dare = [];
-var question_memory = [];
-var question_linkedTo = [];
-var question_multiplayer = [];
-var question_all = [];
 
 // JSON ARRAY CONTAING ID AND QUESTION
 var allQuestions = {};
@@ -15,16 +9,12 @@ allQuestions.entries = new Array();
 var current_game_questions = {};
 current_game_questions.entries = new Array();
 
+//memory array
+var memoryArray = {};
+memoryArray = new Array();
+
 // DELETED QUESTIONS
 var deleted_question_IDs = [];
-
-// COUNTERS
-var truth_in = 0;
-var dare_in = 0;
-var memory_in = 0;
-var multiplayer_in = 0;
-var all_in = 0;
-
 
 function onpoop() {
 
@@ -33,13 +23,7 @@ function onpoop() {
 }
 onpoop();
 
-window.onload = function(e) {
-
-  $('.modal').modal();
-  $('#modal1').modal('open');
-}
-
-function getQuestions(question_truth, question_dare, question_memory, question_linkedTo, question_multiplayer, question_all, truth_in, dare_in, memory_in, multiplayer_in, all_in) {
+function getQuestions() {
 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function() {
@@ -68,12 +52,12 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
 
                     while (j < 5) { // NOT MORE THAN 5 PLAYER_NAMES!!!!
 
-											 newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
-
                     	while(addedName==playerNameThisCard){
                        			playerIndexThisCard = Math.floor(Math.random()*tall);
                             playerNameThisCard = allPlayers[playerIndexThisCard];
                       }
+
+                      newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
 
                       obj[i].question = newString;
                       j++;
@@ -94,7 +78,7 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
                   }
 
                     else if (obj[i].type === '2') {
-
+											// DARE
                       j = 0;
                       addedName="koko";
                       playerIndexThisCard = Math.floor(Math.random()*tall);
@@ -102,13 +86,12 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
 
                       while (j < 5) { // NOT MORE THAN 5 PLAYER_NAMES!!!!
 
-                        addedName = playerNameThisCard;
-                        newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
-
                         while(addedName==playerNameThisCard){
                          			playerIndexThisCard = Math.floor(Math.random()*tall);
                               playerNameThisCard = allPlayers[playerIndexThisCard];
                         }
+
+                        newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
 
                         obj[i].question = newString;
                         j++;
@@ -134,23 +117,34 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
                     playerIndexThisCard = Math.floor(Math.random()*tall);
                     playerNameThisCard = allPlayers[playerIndexThisCard];
 
-                    while (j < 5) { // NOT MORE THAN 5 PLAYER_NAMES!!!!
+                    //while (j < 5) { // NOT MORE THAN 5 PLAYER_NAMES!!!!
 
-                      addedName = playerNameThisCard;
-
-                      newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
-
+                      /*
                       while(addedName==playerNameThisCard){
                        			playerIndexThisCard = Math.floor(Math.random()*tall);
                             playerNameThisCard = allPlayers[playerIndexThisCard];
-                      }
+                      */
+
+                      newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
+
+                      // store in memory array
 
                       obj[i].question = newString;
                       j++;
-                      addedName=playerNameThisCard;
+                      //addedName=playerNameThisCard;
 
-                      playerIndexThisCard = Math.floor(Math.random()*tall);
-                    	playerNameThisCard = allPlayers[playerIndexThisCard];
+                      //playerIndexThisCard = Math.floor(Math.random()*tall);
+                    	//playerNameThisCard = allPlayers[playerIndexThisCard];
+                    //}
+
+                    if (obj[i].ID == '0') {
+
+                    } else {
+                      memoryArray.push({
+                        "ID" : obj[i].linkedTo,
+                        "player_name" : playerNameThisCard
+                      });
+                      console.log(memoryArray);
                     }
 
                      //question_memory.push(newString);
@@ -166,10 +160,31 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
 
                   else if (obj[i].type === '4') {
                     // LINKED TO
+                    j = 0;
+                    addedName="koko";
+
+                    //loop through memoryArray for matchind ID
+                    for (var j = 0; j < memoryArray.length; j++) {
+
+                      if (memoryArray.ID == null) {
+
+                      } else {
+
+                        if (memoryArray.ID[j] == obj[i].linkedTo) {
+
+                          playerNameThisCard = memoryArray.player_name[j];
+
+                        }
+                    }
+
+                    }
+
+                    newString = (obj[i].question).replace("MEMORY_NAME", playerNameThisCard);
+
                     allQuestions.entries.push({
                      	"ID" : obj[i].linkedTo,
                       "Type" : "4",
-                      "Question" : obj[i].question
+                      "Question" : newString
                      });
                     //question_linkedTo.push(obj[i].question);
                     //console.log(question_linkedTo);
@@ -184,17 +199,13 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
 
                     while (j < 5) { // NOT MORE THAN 5 PLAYER_NAMES!!!!
 
-                      addedName = playerNameThisCard;
-
-                      newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
-                      addedName = playerNameThisCard;
-
 
                       while(addedName==playerNameThisCard) {
 
                        			playerIndexThisCard = Math.floor(Math.random()*tall);
                             playerNameThisCard = allPlayers[playerIndexThisCard];
                       }
+                      newString = (obj[i].question).replace("PLAYER_NAME", playerNameThisCard);
 
                       obj[i].question = newString;
                       j++;
@@ -222,21 +233,21 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
                       "Question" : obj[i].question
                      });
                     //question_all.push(obj[i].question);
-                    //console.log(question_all);
+
                   }
 
                 }
-                //console.log(allQuestions.entries);
-                createGame(question_truth, question_dare, question_memory, question_linkedTo, question_multiplayer, question_all, truth_in, dare_in, memory_in, multiplayer_in, all_in);
+                console.log(allQuestions.entries);
+                createGame();
             }
         };
         xmlhttp.open("GET", "http://192.81.223.225/api/index.php", true);
         xmlhttp.send();
 
 }
-  getQuestions(question_truth, question_dare, question_memory, question_linkedTo, question_multiplayer, question_all, truth_in, dare_in, memory_in, multiplayer_in, all_in);
+  getQuestions();
 
-  function createGame(question_truth, question_dare, question_memory, question_linkedTo, question_multiplayer, question_all, truth_in, dare_in, memory_in, multiplayer_in, all_in) {
+  function createGame() {
 
     var players = allPlayers;
 
@@ -331,7 +342,8 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
         }
       }
     }
-    console.log(current_game_questions);
+    //console.log(current_game_questions);
+    sortOutMemoryPosition();
 
   }
 
@@ -343,8 +355,8 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
 
   }
   //-----------------------------------------------------------------
-  var game_counter = 0;
-  var status = 1;
+  var game_counter = -1;
+  var status;
 
   function gameCounter() {
 
@@ -352,14 +364,65 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
     return game_counter;
   }
 
-  function game() {
+  // memory in game array
+  var memoryInGameArray = {};
+  memoryInGameArray = new Array();
+
+  function sortOutMemoryPosition() {
+
+    var game_length = current_game_questions.entries.length;
+
+    for (var i = 0; i < current_game_questions.entries.length; i++) {
+
+      if (current_game_questions.entries[i].Type == '3') {
+
+        if (i > Math.floor(game_length/100*50)) {
+
+          // reposition memory question
+          // overwrite question below 50%
+          console.error("Type 3 question in second half of array");
+
+          // get random number from first half of the questions
+          var firstHalfNumber = Math.floor(Math.random() * Math.floor(game_length/100*50)) + 1;
+
+          console.log("First half random number = "+ firstHalfNumber);
+          console.log("i in for loop = "+ i);
+
+          // overwrite random question
+
+          console.log("Changing array...");
+
+          current_game_questions.entries[firstHalfNumber].ID = current_game_questions.entries[i].ID;
+          current_game_questions.entries[firstHalfNumber].Type = current_game_questions.entries[i].Type;
+          current_game_questions.entries[firstHalfNumber].Question = current_game_questions.entries[i].Question;
+
+          // delete old position, otherwise it will double
+          delete current_game_questions.entries[i];
+
+        }
+      }
+    }
+    console.log(current_game_questions);
+    game();
+  }
+
+  var restart;
+
+  function game(clicked_id) {
+
+    if (clicked_id == 'restart') {
+      window.location = "";
+    }
+
+    status = 1;
+    //console.log(current_game_questions);
 
     // color identifiers
-    var truth_color = 'green';
-    var dare_color = 'blue';
-    var memory_color = 'yellow';
-    var multiplayer_color = 'orange';
-    var all_color = 'red';
+    var truth_color = 'assets/images/greenBack.jpg'; //green
+    var dare_color = 'assets/images/blueBack.jpg'; //blue
+    var memory_color = 'assets/images/burgBack.jpg'; // #6b1313
+    var multiplayer_color = 'assets/images/orangeBack.jpg'; // orange
+    var all_color = 'assets/images/redBack.jpg'; //red
 
     var game_counter = gameCounter();
     var game_length = current_game_questions.entries.length;
@@ -368,40 +431,95 @@ function getQuestions(question_truth, question_dare, question_memory, question_l
     if (game_counter == game_length) {
 
       status = 0;
+      console.log(game_counter +" og "+ game_length);
 
       console.log("Game finished");
 
       var html = "";
           html += '<h4 style="color:white;">Spillet er ferdig!</h4>';
-          html += '';
-          html += '';
-          html += '';
+          html += '<button style="border: 1px solid white;border-radius:14px;background:white;margin-right:20px;" onclick="returnToMenu()"><p style="text:center;color:black;">Returner til meny</p></button>';
+          html += '<button id="restart" style="border: 1px solid white;border-radius:14px;background:white;" onclick="game(this.id)"><p style="text:center;color:black;">Start på nytt</p></button>';
 
       document.getElementById("question-div").innerHTML = html;
 
     } else {
 
-      // set body color based on question type
-      if (current_game_questions.entries[game_counter].Type == '1') {
-        document.getElementById("body").style.backgroundColor = truth_color;
-      } else if (current_game_questions.entries[game_counter].Type == '2') {
-        document.getElementById("body").style.backgroundColor = dare_color;
-      } else if (current_game_questions.entries[game_counter].Type == '3') {
-        document.getElementById("body").style.backgroundColor = memory_color;
-      } else if (current_game_questions.entries[game_counter].Type == '5') {
-        document.getElementById("body").style.backgroundColor = multiplayer_color;
-      } else if (current_game_questions.entries[game_counter].Type == '6') {
-        document.getElementById("body").style.backgroundColor = all_color;
-      }
+      if (current_game_questions.entries[game_counter].Type == '3') {
 
-      document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
+        document.getElementById("body").style.backgroundImage = memory_color;
+
+        memoryInGameArray.push({
+          "ID" : current_game_questions.entries[game_counter].ID,
+          "count" : game_counter
+        });
+        //console.log(memoryInGameArray);
+
+        document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
+
+      } else {
+
+
+
+        // set body color based on question type
+        if (current_game_questions.entries[game_counter].Type == '1') {
+          //document.getElementById("body").style.backgroundImage = truth_color;
+          $('body').css('background-image', 'url('+ truth_color +')');
+        } else if (current_game_questions.entries[game_counter].Type == '2') {
+          //document.getElementById("body").style.backgroundImage = dare_color;
+          $('body').css('background-image', 'url('+ dare_color +')');
+        } else if (current_game_questions.entries[game_counter].Type == '5') {
+          //document.getElementById("body").style.backgroundImage = multiplayer_color;
+          $('body').css('background-image', 'url('+ multiplayer_color +')');
+        } else if (current_game_questions.entries[game_counter].Type == '6') {
+          //document.getElementById("body").style.backgroundImage = all_color;
+          $('body').css('background-image', 'url('+ all_color +')');
+        }
+
+        document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
       }
+    }
   }
-  window.addEventListener('touchstart', function() {
 
+  function returnToMenu(status) {
+    window.location.replace("start.html");
+    document.location = "start.html";
+  }
+  window.onload = function(e) {
+
+    $('.modal').modal();
+    //$('#modal1').modal('open');
+    //$('#orientation-warning-modal').modal('open');
+  }
+
+  window.addEventListener('touchstart', function() {
     if (status = 1) {
       game();
-    } else {
-      alert('back');
     }
   });
+
+  function preloadImages(array) {
+      if (!preloadImages.list) {
+          preloadImages.list = [];
+      }
+      var list = preloadImages.list;
+      for (var i = 0; i < array.length; i++) {
+          var img = new Image();
+          img.onload = function() {
+              var index = list.indexOf(this);
+              if (index !== -1) {
+                  // remove image from the array once it's loaded
+                  // for memory consumption reasons
+                  list.splice(index, 1);
+              }
+          }
+          list.push(img);
+          img.src = array[i];
+      }
+  }
+
+  preloadImages(["assets/images/yellowBack.jpg",
+  "assets/images/redBack.jpg",
+  "assets/images/orangeBack.jpg",
+  "assets/images/blueBack.jpg",
+  "assets/images/greenBack.jpg",
+  "assets/images/burgBack.jpg"]);
