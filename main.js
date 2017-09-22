@@ -13,6 +13,9 @@ current_game_questions.entries = new Array();
 var memoryArray = {};
 memoryArray = new Array();
 
+var memoryType4Array = {};
+memoryType4Array = new Array();
+
 // DELETED QUESTIONS
 var deleted_question_IDs = [];
 
@@ -181,6 +184,12 @@ function getQuestions() {
 
                     newString = (obj[i].question).replace("MEMORY_NAME", playerNameThisCard);
 
+                    memoryType4Array.push({
+                      "ID" : obj[i].linkedTo,
+                      "Type" : "4",
+                      "Question" : newString
+                    });
+
                     allQuestions.entries.push({
                      	"ID" : obj[i].linkedTo,
                       "Type" : "4",
@@ -265,7 +274,8 @@ function getQuestions() {
     // aboslute numbers
     var qTruth_count = Math.floor((game_length/100) * 30); // 30 %
     var qDare_count = Math.floor((game_length/100) * 25); // 25 %
-    var qMemory_count = Math.floor((game_length/100) * 15); // 15 %
+    var qMemory_count = 1;
+    // Math.floor((game_length/100) * 15); // 15 %
     var qMultiplayer_count = Math.floor((game_length/100) * 15); // 15 %
     var qAll_count = Math.floor((game_length/100) * 15); // 15 %
 
@@ -302,7 +312,7 @@ function getQuestions() {
 
       } else if (allQuestions.entries[randomNumber].Type == '3') {
 
-        if (qMemory_count >= 0) { // push to array
+        if (qMemory_count > 0) { // push to array
 
           current_game_questions.entries.push({
             "ID" : allQuestions.entries[randomNumber].ID,
@@ -446,19 +456,65 @@ function getQuestions() {
 
       if (current_game_questions.entries[game_counter].Type == '3') {
 
-        document.getElementById("body").style.backgroundImage = memory_color;
-
-        memoryInGameArray.push({
-          "ID" : current_game_questions.entries[game_counter].ID,
-          "count" : game_counter
-        });
-        //console.log(memoryInGameArray);
+        $('body').css('background-image', 'url('+ memory_color +')');
 
         document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
 
+        memoryInGameArray.push({
+          "ID" : current_game_questions.entries[game_counter].ID,
+          "count" : game_counter,
+          "appear" : game_counter + Math.floor(game_length/100*20), // when type 4 will appear
+          "appeared" : '0'
+        });
+        console.log(memoryInGameArray);
+
       } else {
 
+        if (memoryInGameArray.length > 0) { // if array is not empty
 
+          //if (memoryInGameArray[0].appeared == '0') {
+
+          var memarr_counter = 0;
+          //while (memarr_counter <= memoryInGameArray.length) { // loop through length of array
+
+            if (game_counter == memoryInGameArray[0].appear) { // game_counter matches appear
+
+              for (var i = 0; i < memoryType4Array.length; i++) {
+
+                if (memoryType4Array[i].ID == memoryInGameArray[0].ID) {
+
+                  $('body').css('background-image', 'url('+ memory_color +')');
+                  document.getElementById("game-question").innerHTML = memoryType4Array[i].Question;
+
+                }
+              }
+            }
+            //memarr_counter++;
+          //}
+        //}
+        else {
+
+          // EIRIK´S SUPER GHETTO LØSNING
+
+          // set body color based on question type
+          if (current_game_questions.entries[game_counter].Type == '1') {
+            //document.getElementById("body").style.backgroundImage = truth_color;
+            $('body').css('background-image', 'url('+ truth_color +')');
+          } else if (current_game_questions.entries[game_counter].Type == '2') {
+            //document.getElementById("body").style.backgroundImage = dare_color;
+            $('body').css('background-image', 'url('+ dare_color +')');
+          } else if (current_game_questions.entries[game_counter].Type == '5') {
+            //document.getElementById("body").style.backgroundImage = multiplayer_color;
+            $('body').css('background-image', 'url('+ multiplayer_color +')');
+          } else if (current_game_questions.entries[game_counter].Type == '6') {
+            //document.getElementById("body").style.backgroundImage = all_color;
+            $('body').css('background-image', 'url('+ all_color +')');
+          }
+
+          document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
+
+        }
+        } else {
 
         // set body color based on question type
         if (current_game_questions.entries[game_counter].Type == '1') {
@@ -476,6 +532,7 @@ function getQuestions() {
         }
 
         document.getElementById("game-question").innerHTML = current_game_questions.entries[game_counter].Question;
+        }
       }
     }
   }
