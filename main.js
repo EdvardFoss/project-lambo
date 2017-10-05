@@ -1,4 +1,3 @@
-
 // GET COOKIE WITH PLAYER NAMES
 var allPlayers // array with all players
 
@@ -71,6 +70,7 @@ function getQuestions() {
                     }
 
 											allQuestions.entries.push({
+                        "qID" : obj[i].ID,
                        	"ID" : obj[i].linkedTo,
                         "Type" : "1",
                         "Question" : newString
@@ -104,6 +104,7 @@ function getQuestions() {
                       	playerNameThisCard = allPlayers[playerIndexThisCard];
                       }
                         allQuestions.entries.push({
+                        "qID" : obj[i].ID,
                        	"ID" : obj[i].linkedTo,
                         "Type" : "2",
                         "Question" : newString
@@ -144,14 +145,16 @@ function getQuestions() {
 
                     } else {
                       memoryArray.push({
+                        "qID" : obj[i].ID,
                         "ID" : obj[i].linkedTo,
                         "player_name" : playerNameThisCard
                       });
-                      console.log(memoryArray);
+                      //console.log(memoryArray);
                     }
 
                      //question_memory.push(newString);
                      allQuestions.entries.push({
+                      "qID" : obj[i].ID,
                      	"ID" : obj[i].linkedTo,
                       "Type" : "3",
                       "Question" : newString
@@ -185,12 +188,14 @@ function getQuestions() {
                     newString = (obj[i].question).replace("MEMORY_NAME", playerNameThisCard);
 
                     memoryType4Array.push({
+                      "qID" : obj[i].ID,
                       "ID" : obj[i].linkedTo,
                       "Type" : "4",
                       "Question" : newString
                     });
 
                     allQuestions.entries.push({
+                      "qID" : obj[i].ID,
                      	"ID" : obj[i].linkedTo,
                       "Type" : "4",
                       "Question" : newString
@@ -225,6 +230,7 @@ function getQuestions() {
                     }
 
                     	allQuestions.entries.push({
+                      "qID" : obj[i].ID,
                      	"ID" : obj[i].linkedTo,
                       "Type" : "5",
                       "Question" : newString
@@ -237,6 +243,7 @@ function getQuestions() {
                   else if (obj[i].type === '6') {
                     // ALL
                     allQuestions.entries.push({
+                      "qID" : obj[i].ID,
                      	"ID" : obj[i].linkedTo,
                       "Type" : "6",
                       "Question" : obj[i].question
@@ -246,7 +253,7 @@ function getQuestions() {
                   }
 
                 }
-                console.log(allQuestions.entries);
+                //console.log(allQuestions.entries);
                 createGame();
             }
         };
@@ -289,6 +296,7 @@ function getQuestions() {
         if (qTruth_count >= 0) { // push to array
 
           current_game_questions.entries.push({
+            "qID" : allQuestions.entries[randomNumber].qID,
             "ID" : allQuestions.entries[randomNumber].ID,
             "Type" : "1",
             "Question" : allQuestions.entries[randomNumber].Question
@@ -302,6 +310,7 @@ function getQuestions() {
         if (qDare_count >= 0) { // push to array
 
           current_game_questions.entries.push({
+            "qID" : allQuestions.entries[randomNumber].qID,
             "ID" : allQuestions.entries[randomNumber].ID,
             "Type" : "2",
             "Question" : allQuestions.entries[randomNumber].Question
@@ -315,6 +324,7 @@ function getQuestions() {
         if (qMemory_count > 0) { // push to array
 
           current_game_questions.entries.push({
+            "qID" : allQuestions.entries[randomNumber].qID,
             "ID" : allQuestions.entries[randomNumber].ID,
             "Type" : "3",
             "Question" : allQuestions.entries[randomNumber].Question
@@ -329,6 +339,7 @@ function getQuestions() {
         if (qMultiplayer_count >= 0) { // push to array
 
           current_game_questions.entries.push({
+            "qID" : allQuestions.entries[randomNumber].qID,
             "ID" : allQuestions.entries[randomNumber].ID,
             "Type" : "5",
             "Question" : allQuestions.entries[randomNumber].Question
@@ -343,6 +354,7 @@ function getQuestions() {
         if (qAll_count >= 0) { // push to array
 
           current_game_questions.entries.push({
+            "qID" : allQuestions.entries[randomNumber].qID,
             "ID" : allQuestions.entries[randomNumber].ID,
             "Type" : "6",
             "Question" : allQuestions.entries[randomNumber].Question
@@ -353,7 +365,7 @@ function getQuestions() {
       }
     }
     //console.log(current_game_questions);
-    sortOutMemoryPosition();
+    checkIfDuplicateQuestion();
 
   }
 
@@ -373,7 +385,36 @@ function getQuestions() {
     game_counter++;
     return game_counter;
   }
+  //-----
+  function checkIfDuplicateQuestion() {
 
+    var qIDArray = [];
+
+    for (var i = 0; i < current_game_questions.entries.length; i++) {
+      qIDArray.push(current_game_questions.entries[i].qID);
+    }
+    var count = {};
+    qIDArray.forEach(function(i) {
+      count[i] = (count[i]||0) + 1;
+    });
+    console.log(count);
+
+    for (var i = 0; i < count.length; i++) {
+
+      if (count[i] > 1) {
+        console.log("ballefarn");
+        delete current_game_questions.entries[i];
+      }
+    }
+
+    console.log(current_game_questions);
+
+
+
+    sortOutMemoryPosition();
+
+  }
+  //-----
   // memory in game array
   var memoryInGameArray = {};
   memoryInGameArray = new Array();
@@ -395,6 +436,11 @@ function getQuestions() {
           // get random number from first half of the questions
           var firstHalfNumber = Math.floor(Math.random() * Math.floor(game_length/100*50)) + 1;
 
+          // ensure minimum number of cards between memory cards to be 2 OR MORE.
+          while (firstHalfNumber <= 2) {
+         	  firstHalfNumber = Math.floor(Math.random() * Math.floor(game_length/100*50)) + 1;
+        	}
+
           console.log("First half random number = "+ firstHalfNumber);
           console.log("i in for loop = "+ i);
 
@@ -406,13 +452,13 @@ function getQuestions() {
           current_game_questions.entries[firstHalfNumber].Type = current_game_questions.entries[i].Type;
           current_game_questions.entries[firstHalfNumber].Question = current_game_questions.entries[i].Question;
 
-          // delete old position, otherwise it will double
+          // delete old position, otherwise it will duplicate
           delete current_game_questions.entries[i];
 
         }
       }
     }
-    console.log(current_game_questions);
+    //console.log(current_game_questions);
     game();
   }
 
@@ -466,7 +512,7 @@ function getQuestions() {
           "appear" : game_counter + Math.floor(game_length/100*20), // when type 4 will appear
           "appeared" : '0'
         });
-        console.log(memoryInGameArray);
+        //console.log(memoryInGameArray);
 
       } else {
 
